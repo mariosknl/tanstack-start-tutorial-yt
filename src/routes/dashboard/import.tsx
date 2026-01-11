@@ -38,7 +38,7 @@ function RouteComponent() {
     },
     onSubmit: ({ value }) => {
       startTransition(async () => {
-        await scrapeUrlFn()
+        await scrapeUrlFn({ data: value })
       })
     },
   })
