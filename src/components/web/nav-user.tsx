@@ -1,19 +1,11 @@
 'use client'
 
-import {
-  BadgeCheck,
-  Bell,
-  ChevronsUpDown,
-  CreditCard,
-  LogOut,
-  Sparkles,
-} from 'lucide-react'
+import { ChevronsUpDown, LogOut } from 'lucide-react'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -25,6 +17,9 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@/components/ui/sidebar'
+import { toast } from 'sonner'
+import { authClient } from '@/lib/auth-client'
+import { useNavigate } from '@tanstack/react-router'
 
 export function NavUser({
   user,
@@ -36,6 +31,21 @@ export function NavUser({
   }
 }) {
   const { isMobile } = useSidebar()
+  const navigate = useNavigate()
+
+  const handleSignout = async () => {
+    await authClient.signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          toast.success('Logged out successfully')
+          navigate({ to: '/' })
+        },
+        onError: ({ error }) => {
+          toast.error(error.message)
+        },
+      },
+    })
+  }
 
   return (
     <SidebarMenu>
@@ -75,30 +85,9 @@ export function NavUser({
                 </div>
               </div>
             </DropdownMenuLabel>
+
             <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <Sparkles />
-                Upgrade to Pro
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <BadgeCheck />
-                Account
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <CreditCard />
-                Billing
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Bell />
-                Notifications
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={handleSignout}>
               <LogOut />
               Log out
             </DropdownMenuItem>
