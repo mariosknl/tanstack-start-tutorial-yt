@@ -43,7 +43,7 @@ export function Navbar() {
               >
                 Logout
               </Button>
-              <Link to="/" className={buttonVariants()}>
+              <Link to="/dashboard" className={buttonVariants()}>
                 Dashboard
               </Link>
             </>
