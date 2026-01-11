@@ -1,8 +1,26 @@
-import { Link } from '@tanstack/react-router'
-import { buttonVariants } from '../ui/button'
+import { Link, useNavigate } from '@tanstack/react-router'
+import { Button, buttonVariants } from '../ui/button'
 import { ThemeToggle } from './them-toggle'
+import { authClient } from '@/lib/auth-client'
+import { toast } from 'sonner'
 
 export function Navbar() {
+  const { data: session, isPending } = authClient.useSession()
+  const navigate = useNavigate()
+  const handleSignout = async () => {
+    await authClient.signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          toast.success('Logged out successfully')
+          navigate({ to: '/' })
+        },
+        onError: ({ error }) => {
+          toast.error(error.message)
+        },
+      },
+    })
+  }
+
   return (
     <nav className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
@@ -17,15 +35,34 @@ export function Navbar() {
 
         <div className="flex items-center gap-3">
           <ThemeToggle />
-          <Link
-            to="/login"
-            className={buttonVariants({ variant: 'secondary' })}
-          >
-            Login
-          </Link>
-          <Link to="/signup" className={buttonVariants({ variant: 'default' })}>
-            Get Started
-          </Link>
+          {isPending ? null : session ? (
+            <>
+              <Button
+                className={buttonVariants({ variant: 'secondary' })}
+                onClick={handleSignout}
+              >
+                Logout
+              </Button>
+              <Link to="/" className={buttonVariants()}>
+                Dashboard
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link
+                to="/login"
+                className={buttonVariants({ variant: 'secondary' })}
+              >
+                Login
+              </Link>
+              <Link
+                to="/signup"
+                className={buttonVariants({ variant: 'default' })}
+              >
+                Get Started
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </nav>
